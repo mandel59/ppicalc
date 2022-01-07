@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 export type Props = {
   size?: number;
@@ -47,7 +47,7 @@ export function PPICalc(props: Props) {
             id="size"
             name="size"
             value={size}
-            onChange={(ev) => setSize(Number(ev.target.value))}
+            onChange={useCallback((ev) => setSize(Number(ev.target.value)), [])}
           />
         </label>
         <label>
@@ -57,7 +57,10 @@ export function PPICalc(props: Props) {
             id="width"
             name="width"
             value={width}
-            onChange={(ev) => setWidth(Number(ev.target.value))}
+            onChange={useCallback(
+              (ev) => setWidth(Number(ev.target.value)),
+              []
+            )}
           />
         </label>
         <label>
@@ -67,14 +70,17 @@ export function PPICalc(props: Props) {
             id="height"
             name="height"
             value={height}
-            onChange={(ev) => setHeight(Number(ev.target.value))}
+            onChange={useCallback(
+              (ev) => setHeight(Number(ev.target.value)),
+              []
+            )}
           />
         </label>
         <div className="grid">
-          <button onClick={() => setResolution(1280, 720)}>HD</button>
-          <button onClick={() => setResolution(1920, 1080)}>FHD</button>
-          <button onClick={() => setResolution(2560, 1440)}>QHD</button>
-          <button onClick={() => setResolution(3840, 2160)}>4K</button>
+          <button onClick={useCallback(() => setResolution(1280, 720), [])}>HD</button>
+          <button onClick={useCallback(() => setResolution(1920, 1080), [])}>FHD</button>
+          <button onClick={useCallback(() => setResolution(2560, 1440), [])}>QHD</button>
+          <button onClick={useCallback(() => setResolution(3840, 2160), [])}>4K</button>
         </div>
       </div>
       <label>
