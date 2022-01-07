@@ -10,7 +10,9 @@ module.exports = {
     path: path.resolve(__dirname, 'public')
   },
   plugins: [
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      title: 'PPI Calc',
+    }),
     new InjectBodyPlugin({
       content: '<div id=approot></div>'
     })
