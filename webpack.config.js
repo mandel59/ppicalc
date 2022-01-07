@@ -3,8 +3,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const InjectBodyPlugin = require('inject-body-webpack-plugin').default
 
 module.exports = {
-  // mode: 'development',
-  mode: 'production',
   entry: './src/main.tsx',
   output: {
     path: path.resolve(__dirname, 'public')
