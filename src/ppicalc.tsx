@@ -6,6 +6,8 @@ export type Props = {
   height?: number;
 };
 
+const inch2mm = 25.4;
+
 export function PPICalc(props: Props) {
   const [size, setSize] = useState(props.size ?? 27);
   const [width, setWidth] = useState(props.width ?? 1920);
@@ -36,7 +38,16 @@ export function PPICalc(props: Props) {
     setWidth(width);
     setHeight(height);
   };
-  const ppi = Math.sqrt(width ** 2 + height ** 2) / size;
+  const a2 = width ** 2;
+  const b2 = height ** 2;
+  const c2 = a2 + b2;
+  const c = Math.sqrt(c2);
+  const widthinch = size * width / c;
+  const heightinch = size * height / c;
+  const widthmm = widthinch * inch2mm;
+  const heightmm = heightinch * inch2mm;
+  const area = widthmm * heightmm / 100;
+  const ppi = c / size;
   return (
     <div className="grid">
       <div>
@@ -77,16 +88,34 @@ export function PPICalc(props: Props) {
           />
         </label>
         <div className="grid">
-          <button onClick={useCallback(() => setResolution(1280, 720), [])}>HD</button>
-          <button onClick={useCallback(() => setResolution(1920, 1080), [])}>FHD</button>
-          <button onClick={useCallback(() => setResolution(2560, 1440), [])}>QHD</button>
-          <button onClick={useCallback(() => setResolution(3840, 2160), [])}>4K</button>
+          <button onClick={useCallback(() => setResolution(1280, 720), [])}>
+            HD
+          </button>
+          <button onClick={useCallback(() => setResolution(1920, 1080), [])}>
+            FHD
+          </button>
+          <button onClick={useCallback(() => setResolution(2560, 1440), [])}>
+            QHD
+          </button>
+          <button onClick={useCallback(() => setResolution(3840, 2160), [])}>
+            4K
+          </button>
         </div>
       </div>
-      <label>
-        Resolution{" "}
-        <output htmlFor="size width height">{ppi.toFixed(2)} ppi</output>
-      </label>
+      <div>
+        <label>
+          Dimension{" "}
+          <output htmlFor="size width height">{widthmm.toFixed(1)} mm × {heightmm.toFixed(1)} mm</output>
+        </label>
+        <label>
+          Area{" "}
+          <output htmlFor="size width height">{area.toFixed(1)} cm²</output>
+        </label>
+        <label>
+          Resolution{" "}
+          <output htmlFor="size width height">{ppi.toFixed(2)} ppi</output>
+        </label>
+      </div>
     </div>
   );
 }
