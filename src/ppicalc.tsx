@@ -42,11 +42,11 @@ export function PPICalc(props: Props) {
   const b2 = height ** 2;
   const c2 = a2 + b2;
   const c = Math.sqrt(c2);
-  const widthinch = size * width / c;
-  const heightinch = size * height / c;
+  const widthinch = (size * width) / c;
+  const heightinch = (size * height) / c;
   const widthmm = widthinch * inch2mm;
   const heightmm = heightinch * inch2mm;
-  const area = widthmm * heightmm / 100;
+  const area = (widthmm * heightmm) / 100;
   const ppi = c / size;
   return (
     <div className="grid">
@@ -104,15 +104,24 @@ export function PPICalc(props: Props) {
       </div>
       <div>
         <label>
-          Dimension{" "}
-          <output htmlFor="size width height">{widthmm.toFixed(1)} mm × {heightmm.toFixed(1)} mm</output>
+          Dimension:{" "}
+          <output htmlFor="size width height">
+            {widthmm.toFixed(1)} mm × {heightmm.toFixed(1)} mm
+          </output>
         </label>
         <label>
-          Area{" "}
+          Area:{" "}
           <output htmlFor="size width height">{area.toFixed(1)} cm²</output>
         </label>
         <label>
-          Resolution{" "}
+          Pixel count:{" "}
+          <output htmlFor="width height">
+            {width * height} pixels ={" "}
+            {((width * height) / 1_000_000).toFixed(2)} megapixels
+          </output>
+        </label>
+        <label>
+          Pixel density:{" "}
           <output htmlFor="size width height">{ppi.toFixed(2)} ppi</output>
         </label>
       </div>
