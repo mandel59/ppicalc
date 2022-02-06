@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 export type Props = {
   size?: number;
@@ -37,17 +38,20 @@ export function PPICalc(props: Props) {
       if (distance) setDistance(Number(distance));
     }
   }, []);
-  useEffect(() => {
-    const hash =
-      "#" +
-      new URLSearchParams([
-        ["size", String(size)],
-        ["width", String(width)],
-        ["height", String(height)],
-        ["distance", String(distance)],
-      ]).toString();
-    history.replaceState(null, "", new URL(hash, location.href).href);
-  }, [size, width, height, distance]);
+  useEffect(
+    useDebouncedCallback(() => {
+      const hash =
+        "#" +
+        new URLSearchParams([
+          ["size", String(size)],
+          ["width", String(width)],
+          ["height", String(height)],
+          ["distance", String(distance)],
+        ]).toString();
+      history.replaceState(null, "", new URL(hash, location.href).href);
+    }, 100),
+    [size, width, height, distance]
+  );
   const setResolution = (width: number, height: number) => {
     setWidth(width);
     setHeight(height);
