@@ -1,17 +1,28 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 
 export type Props = {
   size?: number;
   width?: number;
   height?: number;
+  distance?: number;
 };
 
 const inch2mm = 25.4;
+const rad2deg = 180 / Math.PI;
+
+const resolutions: [name: string, width: number, height: number][] = [
+  ["HD", 1280, 720],
+  ["FHD", 1920, 1080],
+  ["QHD", 2560, 1440],
+  ["4K", 3840, 2160],
+  ["8K", 7680, 4320],
+];
 
 export function PPICalc(props: Props) {
   const [size, setSize] = useState(props.size ?? 27);
   const [width, setWidth] = useState(props.width ?? 1920);
   const [height, setHeight] = useState(props.height ?? 1080);
+  const [distance, setDistance] = useState(props.distance ?? 50);
   useEffect(() => {
     const hash = location.hash;
     if (hash.startsWith("#")) {
@@ -19,9 +30,11 @@ export function PPICalc(props: Props) {
       const size = params.get("size");
       const width = params.get("width");
       const height = params.get("height");
+      const distance = params.get("distance");
       if (size) setSize(Number(size));
       if (width) setWidth(Number(width));
       if (height) setHeight(Number(height));
+      if (distance) setDistance(Number(distance));
     }
   }, []);
   useEffect(() => {
@@ -31,9 +44,10 @@ export function PPICalc(props: Props) {
         ["size", String(size)],
         ["width", String(width)],
         ["height", String(height)],
+        ["distance", String(distance)],
       ]).toString();
     history.replaceState(null, "", new URL(hash, location.href).href);
-  }, [size, width, height]);
+  }, [size, width, height, distance]);
   const setResolution = (width: number, height: number) => {
     setWidth(width);
     setHeight(height);
@@ -48,6 +62,12 @@ export function PPICalc(props: Props) {
   const heightmm = heightinch * inch2mm;
   const area = (widthmm * heightmm) / 100;
   const ppi = c / size;
+  const ppmm = ppi / inch2mm;
+  const mmpp = 1 / ppmm;
+  const distancemm = distance * 10;
+  const radpp = mmpp / distancemm;
+  const minpp = radpp * rad2deg * 60;
+  const viewangle = 2 * Math.atan2(widthmm / 2, distancemm) * rad2deg;
   return (
     <div className="grid">
       <div>
@@ -57,8 +77,9 @@ export function PPICalc(props: Props) {
             type="number"
             id="size"
             name="size"
+            min="0"
             value={size}
-            onChange={useCallback((ev) => setSize(Number(ev.target.value)), [])}
+            onChange={(ev) => setSize(Number(ev.target.value))}
           />
         </label>
         <label>
@@ -67,11 +88,9 @@ export function PPICalc(props: Props) {
             type="number"
             id="width"
             name="width"
+            min="0"
             value={width}
-            onChange={useCallback(
-              (ev) => setWidth(Number(ev.target.value)),
-              []
-            )}
+            onChange={(ev) => setWidth(Number(ev.target.value))}
           />
         </label>
         <label>
@@ -80,26 +99,26 @@ export function PPICalc(props: Props) {
             type="number"
             id="height"
             name="height"
+            min="0"
             value={height}
-            onChange={useCallback(
-              (ev) => setHeight(Number(ev.target.value)),
-              []
-            )}
+            onChange={(ev) => setHeight(Number(ev.target.value))}
+          />
+        </label>
+        <label>
+          Distance [cm]
+          <input
+            type="number"
+            id="distance"
+            name="distance"
+            min="0"
+            value={distance}
+            onChange={(ev) => setDistance(Number(ev.target.value))}
           />
         </label>
         <div className="grid">
-          <button onClick={useCallback(() => setResolution(1280, 720), [])}>
-            HD
-          </button>
-          <button onClick={useCallback(() => setResolution(1920, 1080), [])}>
-            FHD
-          </button>
-          <button onClick={useCallback(() => setResolution(2560, 1440), [])}>
-            QHD
-          </button>
-          <button onClick={useCallback(() => setResolution(3840, 2160), [])}>
-            4K
-          </button>
+          {resolutions.map(([name, width, height]) => (
+            <button onClick={() => setResolution(width, height)}>{name}</button>
+          ))}
         </div>
       </div>
       <div>
@@ -114,6 +133,12 @@ export function PPICalc(props: Props) {
           <output htmlFor="size width height">{area.toFixed(1)} cm²</output>
         </label>
         <label>
+          Horizontal angle of view:{" "}
+          <output htmlFor="size width height distance">
+            {viewangle.toFixed(1)}°
+          </output>
+        </label>
+        <label>
           Pixel count:{" "}
           <output htmlFor="width height">
             {width * height} pixels ={" "}
@@ -122,7 +147,21 @@ export function PPICalc(props: Props) {
         </label>
         <label>
           Pixel density:{" "}
-          <output htmlFor="size width height">{ppi.toFixed(2)} ppi</output>
+          <output htmlFor="size width height">
+            {ppi.toFixed(2)} ppi = {ppmm.toFixed(2)} pixels/mm
+          </output>
+        </label>
+        <label>
+          Pixel pitch:{" "}
+          <output htmlFor="size width height">
+            {(mmpp * 1000).toFixed(1)} μm
+          </output>
+        </label>
+        <label>
+          Pixel angle:{" "}
+          <output htmlFor="size width height distance">
+            {minpp.toFixed(2)}′
+          </output>
         </label>
       </div>
     </div>
