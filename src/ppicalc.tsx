@@ -164,7 +164,13 @@ export function PPICalc(props: Props) {
         <label>
           Pixel angle:{" "}
           <output htmlFor="size width height distance">
-            {minpp.toFixed(2)}′
+            {minpp.toFixed(2)}′ = {(minpp / 60).toFixed(4)}°
+          </output>
+        </label>
+        <label>
+          Equivalent eyesight:{" "}
+          <output htmlFor="size width height distance">
+            {(1 / minpp).toFixed(2)}
           </output>
         </label>
       </div>
