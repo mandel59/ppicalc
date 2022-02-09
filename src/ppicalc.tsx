@@ -6,6 +6,8 @@ export type Props = {
   width?: number;
   height?: number;
   distance?: number;
+  projectionDistance?: number;
+  luminance?: number;
 };
 
 const inch2mm = 25.4;
@@ -24,6 +26,7 @@ export function PPICalc(props: Props) {
   const [width, setWidth] = useState(props.width ?? 1920);
   const [height, setHeight] = useState(props.height ?? 1080);
   const [distance, setDistance] = useState(props.distance ?? 50);
+  const [luminance, setLuminance] = useState(props.luminance ?? 200);
   useEffect(() => {
     const hash = location.hash;
     if (hash.startsWith("#")) {
@@ -32,10 +35,12 @@ export function PPICalc(props: Props) {
       const width = params.get("width");
       const height = params.get("height");
       const distance = params.get("distance");
+      const luminance = params.get("luminance");
       if (size) setSize(Number(size));
       if (width) setWidth(Number(width));
       if (height) setHeight(Number(height));
       if (distance) setDistance(Number(distance));
+      if (luminance) setLuminance(Number(luminance));
     }
   }, []);
   useEffect(
@@ -47,10 +52,11 @@ export function PPICalc(props: Props) {
           ["width", String(width)],
           ["height", String(height)],
           ["distance", String(distance)],
+          ["luminance", String(luminance)],
         ]).toString();
       history.replaceState(null, "", new URL(hash, location.href).href);
     }, 100),
-    [size, width, height, distance]
+    [size, width, height, distance, luminance]
   );
   const setResolution = (width: number, height: number) => {
     setWidth(width);
@@ -72,6 +78,8 @@ export function PPICalc(props: Props) {
   const radpp = mmpp / distancemm;
   const minpp = radpp * rad2deg * 60;
   const viewangle = 2 * Math.atan2(widthmm / 2, distancemm) * rad2deg;
+  const illuminance = Math.PI * luminance;
+  const luminousPower = illuminance * (area / 10000);
   return (
     <div className="grid">
       <div>
@@ -108,8 +116,13 @@ export function PPICalc(props: Props) {
             onChange={(ev) => setHeight(Number(ev.target.value))}
           />
         </label>
+        <div className="grid">
+          {resolutions.map(([name, width, height]) => (
+            <button onClick={() => setResolution(width, height)}>{name}</button>
+          ))}
+        </div>
         <label>
-          Distance [cm]
+          Viewing distance [cm]
           <input
             type="number"
             id="distance"
@@ -119,11 +132,17 @@ export function PPICalc(props: Props) {
             onChange={(ev) => setDistance(Number(ev.target.value))}
           />
         </label>
-        <div className="grid">
-          {resolutions.map(([name, width, height]) => (
-            <button onClick={() => setResolution(width, height)}>{name}</button>
-          ))}
-        </div>
+        <label>
+          Peak luminance [cd/m²]
+          <input
+            type="number"
+            id="luminance"
+            name="luminance"
+            min="0"
+            value={luminance}
+            onChange={(ev) => setLuminance(Number(ev.target.value))}
+          />
+        </label>
       </div>
       <div>
         <label>
@@ -171,6 +190,18 @@ export function PPICalc(props: Props) {
           Equivalent eyesight:{" "}
           <output htmlFor="size width height distance">
             {(1 / minpp).toFixed(2)}
+          </output>
+        </label>
+        <label>
+          Equivalent illuminance:{" "}
+          <output htmlFor="luminance">
+            {illuminance.toFixed(0)} lx
+          </output>
+        </label>
+        <label>
+          Equivalent luminous power:{" "}
+          <output htmlFor="size width height luminance">
+            {luminousPower.toFixed(0)} lm
           </output>
         </label>
       </div>
