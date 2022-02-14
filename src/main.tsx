@@ -1,14 +1,11 @@
 import "@picocss/pico";
-import React from "react";
-import ReactDom from "react-dom";
+import { render } from "preact";
 import { PPICalc } from "./ppicalc";
 
-ReactDom.render(
-  <React.StrictMode>
-    <main className="container">
-      <h1>PPI Calc</h1>
-      <PPICalc />
-    </main>
-  </React.StrictMode>,
-  document.getElementById("approot")
+render(
+  <main className="container">
+    <h1>PPI Calc</h1>
+    <PPICalc />
+  </main>,
+  document.getElementById("approot")!
 );

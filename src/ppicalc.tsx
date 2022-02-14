@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
+import { useEffect, useState } from "preact/hooks";
+import { useDebouncedCallback } from "use-debounce-preact";
 
 export type Props = {
   size?: number;
@@ -43,8 +43,8 @@ export function PPICalc(props: Props) {
       if (luminance) setLuminance(Number(luminance));
     }
   }, []);
-  useEffect(
-    useDebouncedCallback(() => {
+  const [updateHash] = useDebouncedCallback(
+    () => {
       const hash =
         "#" +
         new URLSearchParams([
@@ -55,9 +55,11 @@ export function PPICalc(props: Props) {
           ["luminance", String(luminance)],
         ]).toString();
       history.replaceState(null, "", new URL(hash, location.href).href);
-    }, 100),
+    },
+    100,
     [size, width, height, distance, luminance]
   );
+  useEffect(updateHash, [size, width, height, distance, luminance]);
   const setResolution = (width: number, height: number) => {
     setWidth(width);
     setHeight(height);
@@ -91,7 +93,9 @@ export function PPICalc(props: Props) {
             name="size"
             min="0"
             value={size}
-            onChange={(ev) => setSize(Number(ev.target.value))}
+            onInput={(ev) =>
+              setSize(Number((ev.target as HTMLInputElement).value))
+            }
           />
         </label>
         <label>
@@ -102,7 +106,9 @@ export function PPICalc(props: Props) {
             name="width"
             min="0"
             value={width}
-            onChange={(ev) => setWidth(Number(ev.target.value))}
+            onInput={(ev) =>
+              setWidth(Number((ev.target as HTMLInputElement).value))
+            }
           />
         </label>
         <label>
@@ -113,7 +119,9 @@ export function PPICalc(props: Props) {
             name="height"
             min="0"
             value={height}
-            onChange={(ev) => setHeight(Number(ev.target.value))}
+            onInput={(ev) =>
+              setHeight(Number((ev.target as HTMLInputElement).value))
+            }
           />
         </label>
         <div className="grid">
@@ -129,7 +137,9 @@ export function PPICalc(props: Props) {
             name="distance"
             min="0"
             value={distance}
-            onChange={(ev) => setDistance(Number(ev.target.value))}
+            onInput={(ev) =>
+              setDistance(Number((ev.target as HTMLInputElement).value))
+            }
           />
         </label>
         <label>
@@ -140,7 +150,9 @@ export function PPICalc(props: Props) {
             name="luminance"
             min="0"
             value={luminance}
-            onChange={(ev) => setLuminance(Number(ev.target.value))}
+            onInput={(ev) =>
+              setLuminance(Number((ev.target as HTMLInputElement).value))
+            }
           />
         </label>
       </div>
@@ -194,9 +206,7 @@ export function PPICalc(props: Props) {
         </label>
         <label>
           Equivalent illuminance:{" "}
-          <output htmlFor="luminance">
-            {illuminance.toFixed(0)} lx
-          </output>
+          <output htmlFor="luminance">{illuminance.toFixed(0)} lx</output>
         </label>
         <label>
           Equivalent luminous power:{" "}
