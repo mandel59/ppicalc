@@ -13,20 +13,75 @@ export type Props = {
 const inch2mm = 25.4;
 const rad2deg = 180 / Math.PI;
 
-const resolutions: [name: string, width: number, height: number][] = [
-  ["HD", 1280, 720],
-  ["FHD", 1920, 1080],
-  ["QHD", 2560, 1440],
-  ["4K", 3840, 2160],
-  ["8K", 7680, 4320],
-];
+function gcd(x: number, y: number) {
+  if (x < 0) {
+    x = -x;
+  }
+  if (y < 0) {
+    y = -y;
+  }
+  if (x < y) {
+    const t = y;
+    y = x;
+    x = t;
+  }
+  while (y > 0) {
+    const t = y;
+    y = x % y;
+    x = t;
+  }
+  return x;
+}
+
+function ratio(x: number, y: number) {
+  const d = gcd(x, y);
+  return [x / d, y / d];
+}
+
+function useNumberInput(id: string, label: any, initialState: number) {
+  const [value, setValue] = useState(String(initialState));
+  const element = (
+    <label>
+      {label}
+      <input
+        type="number"
+        id={id}
+        name={id}
+        min="0"
+        value={value}
+        onInput={(ev) => setValue((ev.target as HTMLInputElement).value)}
+      />
+    </label>
+  );
+  return [Number(value), setValue, element] as const;
+}
 
 export function PPICalc(props: Props) {
-  const [size, setSize] = useState(props.size ?? 27);
-  const [width, setWidth] = useState(props.width ?? 1920);
-  const [height, setHeight] = useState(props.height ?? 1080);
-  const [distance, setDistance] = useState(props.distance ?? 50);
-  const [luminance, setLuminance] = useState(props.luminance ?? 200);
+  const [size, setSize, sizeInput] = useNumberInput(
+    "size",
+    "Size [inches]",
+    props.size ?? 27
+  );
+  const [width, setWidth, widthInput] = useNumberInput(
+    "width",
+    "Width [pixels]",
+    props.width ?? 1920
+  );
+  const [height, setHeight, heightInput] = useNumberInput(
+    "height",
+    "Height [pixels]",
+    props.height ?? 1080
+  );
+  const [distance, setDistance, distanceInput] = useNumberInput(
+    "distance",
+    "Viewing distance [cm]",
+    props.distance ?? 50
+  );
+  const [luminance, setLuminance, luminanceInput] = useNumberInput(
+    "luminance",
+    "Peak luminance [cd/m²]",
+    props.luminance ?? 200
+  );
   useEffect(() => {
     const hash = location.hash;
     if (hash.startsWith("#")) {
@@ -36,11 +91,11 @@ export function PPICalc(props: Props) {
       const height = params.get("height");
       const distance = params.get("distance");
       const luminance = params.get("luminance");
-      if (size) setSize(Number(size));
-      if (width) setWidth(Number(width));
-      if (height) setHeight(Number(height));
-      if (distance) setDistance(Number(distance));
-      if (luminance) setLuminance(Number(luminance));
+      if (size) setSize(size);
+      if (width) setWidth(width);
+      if (height) setHeight(height);
+      if (distance) setDistance(distance);
+      if (luminance) setLuminance(luminance);
     }
   }, []);
   const [updateHash] = useDebouncedCallback(
@@ -61,9 +116,10 @@ export function PPICalc(props: Props) {
   );
   useEffect(updateHash, [size, width, height, distance, luminance]);
   const setResolution = (width: number, height: number) => {
-    setWidth(width);
-    setHeight(height);
+    setWidth(String(width));
+    setHeight(String(height));
   };
+  const aspectRatio = ratio(width, height);
   const a2 = width ** 2;
   const b2 = height ** 2;
   const c2 = a2 + b2;
@@ -80,81 +136,27 @@ export function PPICalc(props: Props) {
   const radpp = mmpp / distancemm;
   const minpp = radpp * rad2deg * 60;
   const viewangle = 2 * Math.atan2(widthmm / 2, distancemm) * rad2deg;
+  const verticalViewangle = 2 * Math.atan2(heightmm / 2, distancemm) * rad2deg;
   const illuminance = Math.PI * luminance;
   const luminousPower = illuminance * (area / 10000);
   return (
     <div className="grid">
       <div>
-        <label>
-          Size [inches]
-          <input
-            type="number"
-            id="size"
-            name="size"
-            min="0"
-            value={size}
-            onInput={(ev) =>
-              setSize(Number((ev.target as HTMLInputElement).value))
-            }
-          />
-        </label>
-        <label>
-          Width [pixels]
-          <input
-            type="number"
-            id="width"
-            name="width"
-            min="0"
-            value={width}
-            onInput={(ev) =>
-              setWidth(Number((ev.target as HTMLInputElement).value))
-            }
-          />
-        </label>
-        <label>
-          Height [pixels]
-          <input
-            type="number"
-            id="height"
-            name="height"
-            min="0"
-            value={height}
-            onInput={(ev) =>
-              setHeight(Number((ev.target as HTMLInputElement).value))
-            }
-          />
-        </label>
-        <div className="grid">
-          {resolutions.map(([name, width, height]) => (
-            <button onClick={() => setResolution(width, height)}>{name}</button>
-          ))}
-        </div>
-        <label>
-          Viewing distance [cm]
-          <input
-            type="number"
-            id="distance"
-            name="distance"
-            min="0"
-            value={distance}
-            onInput={(ev) =>
-              setDistance(Number((ev.target as HTMLInputElement).value))
-            }
-          />
-        </label>
-        <label>
-          Peak luminance [cd/m²]
-          <input
-            type="number"
-            id="luminance"
-            name="luminance"
-            min="0"
-            value={luminance}
-            onInput={(ev) =>
-              setLuminance(Number((ev.target as HTMLInputElement).value))
-            }
-          />
-        </label>
+        {sizeInput}
+        {widthInput}
+        {heightInput}
+        <button
+          onClick={() =>
+            setResolution(
+              screen.width * devicePixelRatio,
+              screen.height * devicePixelRatio
+            )
+          }
+        >
+          Set the width and height of this screen
+        </button>
+        {distanceInput}
+        {luminanceInput}
       </div>
       <div>
         <label>
@@ -168,22 +170,34 @@ export function PPICalc(props: Props) {
           <output htmlFor="size width height">{area.toFixed(1)} cm²</output>
         </label>
         <label>
+          Aspect ratio:{" "}
+          <output htmlFor="width height">
+            {aspectRatio[0]}:{aspectRatio[1]} ≈ {(width / height).toFixed(2)}
+          </output>
+        </label>
+        <label>
           Horizontal angle of view:{" "}
           <output htmlFor="size width height distance">
             {viewangle.toFixed(1)}°
           </output>
         </label>
         <label>
+          Vertical angle of view:{" "}
+          <output htmlFor="size width height distance">
+            {verticalViewangle.toFixed(1)}°
+          </output>
+        </label>
+        <label>
           Pixel count:{" "}
           <output htmlFor="width height">
-            {width * height} pixels ={" "}
+            {width * height} pixels ≈{" "}
             {((width * height) / 1_000_000).toFixed(2)} megapixels
           </output>
         </label>
         <label>
           Pixel density:{" "}
           <output htmlFor="size width height">
-            {ppi.toFixed(2)} ppi = {ppmm.toFixed(2)} pixels/mm
+            {ppi.toFixed(2)} ppi ≈ {ppmm.toFixed(2)} pixels/mm
           </output>
         </label>
         <label>
@@ -195,7 +209,7 @@ export function PPICalc(props: Props) {
         <label>
           Pixel angle:{" "}
           <output htmlFor="size width height distance">
-            {minpp.toFixed(2)}′ = {(minpp / 60).toFixed(4)}°
+            {minpp.toFixed(2)}′ ≈ {(minpp / 60).toFixed(4)}°
           </output>
         </label>
         <label>
