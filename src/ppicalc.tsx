@@ -165,7 +165,7 @@ export function PPICalc(props: Props) {
       </div>
       <div>
         <label>
-          Dimension:{" "}
+          Dimensions:{" "}
           <output htmlFor="size width height">
             {widthmm.toFixed(1)} mm × {heightmm.toFixed(1)} mm
           </output>
