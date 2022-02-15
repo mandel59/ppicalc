@@ -12,6 +12,9 @@ export type Props = {
 
 const inch2mm = 25.4;
 const rad2deg = 180 / Math.PI;
+const inch2px = 96;
+const armsLength = 28;
+const pixelunit = 1 / (armsLength * inch2px);
 
 function gcd(x: number, y: number) {
   if (x < 0) {
@@ -75,7 +78,7 @@ export function PPICalc(props: Props) {
   const [distance, setDistance, distanceInput] = useNumberInput(
     "distance",
     "Viewing distance [cm]",
-    props.distance ?? 50
+    props.distance ?? 80
   );
   const [luminance, setLuminance, luminanceInput] = useNumberInput(
     "luminance",
@@ -131,6 +134,7 @@ export function PPICalc(props: Props) {
   const area = (widthmm * heightmm) / 100;
   const ppi = c / size;
   const ppmm = ppi / inch2mm;
+  const ppcm = ppmm * 10;
   const mmpp = 1 / ppmm;
   const distancemm = distance * 10;
   const radpp = mmpp / distancemm;
@@ -139,6 +143,7 @@ export function PPICalc(props: Props) {
   const verticalViewangle = 2 * Math.atan2(heightmm / 2, distancemm) * rad2deg;
   const illuminance = Math.PI * luminance;
   const luminousPower = illuminance * (area / 10000);
+  const pixelRatio = pixelunit / radpp;
   return (
     <div className="grid">
       <div>
@@ -197,7 +202,7 @@ export function PPICalc(props: Props) {
         <label>
           Pixel density:{" "}
           <output htmlFor="size width height">
-            {ppi.toFixed(2)} ppi ≈ {ppmm.toFixed(2)} pixels/mm
+            {ppi.toFixed(1)} ppi ≈ {ppcm.toFixed(1)} pixels/cm
           </output>
         </label>
         <label>
@@ -209,7 +214,14 @@ export function PPICalc(props: Props) {
         <label>
           Pixel angle:{" "}
           <output htmlFor="size width height distance">
-            {minpp.toFixed(2)}′ ≈ {(minpp / 60).toFixed(4)}°
+            {minpp.toFixed(2)}′ ≈ {(minpp / 60).toFixed(4)}° ≈{" "}
+            {(radpp / pixelunit).toFixed(2)} px
+          </output>
+        </label>
+        <label>
+          Device pixel ratio:{" "}
+          <output htmlFor="size width height distance">
+            {pixelRatio.toFixed(2)} pixels/px
           </output>
         </label>
         <label>
