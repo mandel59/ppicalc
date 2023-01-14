@@ -145,102 +145,105 @@ export function PPICalc(props: Props) {
   const luminousPower = illuminance * (area / 10000);
   const pixelRatio = pixelunit / radpp;
   return (
-    <div className="grid">
-      <div>
-        {sizeInput}
-        {widthInput}
-        {heightInput}
-        <button
-          onClick={() =>
-            setResolution(
-              screen.width * devicePixelRatio,
-              screen.height * devicePixelRatio
-            )
-          }
-        >
-          Set the width and height of this screen
-        </button>
-        {distanceInput}
-        {luminanceInput}
+    <main className="container">
+      <h1>PPI Calc</h1>
+      <div className="grid">
+        <div>
+          {sizeInput}
+          {widthInput}
+          {heightInput}
+          <button
+            onClick={() =>
+              setResolution(
+                screen.width * devicePixelRatio,
+                screen.height * devicePixelRatio
+              )
+            }
+          >
+            Set the width and height of this screen
+          </button>
+          {distanceInput}
+          {luminanceInput}
+        </div>
+        <div>
+          <label>
+            Dimensions:{" "}
+            <output htmlFor="size width height">
+              {widthmm.toFixed(1)} mm × {heightmm.toFixed(1)} mm
+            </output>
+          </label>
+          <label>
+            Area:{" "}
+            <output htmlFor="size width height">{area.toFixed(1)} cm²</output>
+          </label>
+          <label>
+            Aspect ratio:{" "}
+            <output htmlFor="width height">
+              {aspectRatio[0]}:{aspectRatio[1]} ≈ {(width / height).toFixed(2)}
+            </output>
+          </label>
+          <label>
+            Horizontal angle of view:{" "}
+            <output htmlFor="size width height distance">
+              {viewangle.toFixed(1)}°
+            </output>
+          </label>
+          <label>
+            Vertical angle of view:{" "}
+            <output htmlFor="size width height distance">
+              {verticalViewangle.toFixed(1)}°
+            </output>
+          </label>
+          <label>
+            Pixel count:{" "}
+            <output htmlFor="width height">
+              {width * height} pixels ≈{" "}
+              {((width * height) / 1_000_000).toFixed(2)} megapixels
+            </output>
+          </label>
+          <label>
+            Pixel density:{" "}
+            <output htmlFor="size width height">
+              {ppi.toFixed(1)} ppi ≈ {ppcm.toFixed(1)} pixels/cm
+            </output>
+          </label>
+          <label>
+            Pixel pitch:{" "}
+            <output htmlFor="size width height">
+              {(mmpp * 1000).toFixed(1)} μm
+            </output>
+          </label>
+          <label>
+            Pixel angle:{" "}
+            <output htmlFor="size width height distance">
+              {minpp.toFixed(2)}′ ≈ {(minpp / 60).toFixed(4)}° ≈{" "}
+              {(radpp / pixelunit).toFixed(2)} px
+            </output>
+          </label>
+          <label>
+            Device pixel ratio:{" "}
+            <output htmlFor="size width height distance">
+              {pixelRatio.toFixed(2)} pixels/px
+            </output>
+          </label>
+          <label>
+            Equivalent eyesight:{" "}
+            <output htmlFor="size width height distance">
+              {(1 / minpp).toFixed(2)}
+            </output>
+          </label>
+          <label>
+            Equivalent illuminance:{" "}
+            <output htmlFor="luminance">{illuminance.toFixed(0)} lx</output>
+          </label>
+          <label>
+            Equivalent luminous power:{" "}
+            <output htmlFor="size width height luminance">
+              {luminousPower.toFixed(0)} lm
+            </output>
+          </label>
+        </div>
       </div>
-      <div>
-        <label>
-          Dimensions:{" "}
-          <output htmlFor="size width height">
-            {widthmm.toFixed(1)} mm × {heightmm.toFixed(1)} mm
-          </output>
-        </label>
-        <label>
-          Area:{" "}
-          <output htmlFor="size width height">{area.toFixed(1)} cm²</output>
-        </label>
-        <label>
-          Aspect ratio:{" "}
-          <output htmlFor="width height">
-            {aspectRatio[0]}:{aspectRatio[1]} ≈ {(width / height).toFixed(2)}
-          </output>
-        </label>
-        <label>
-          Horizontal angle of view:{" "}
-          <output htmlFor="size width height distance">
-            {viewangle.toFixed(1)}°
-          </output>
-        </label>
-        <label>
-          Vertical angle of view:{" "}
-          <output htmlFor="size width height distance">
-            {verticalViewangle.toFixed(1)}°
-          </output>
-        </label>
-        <label>
-          Pixel count:{" "}
-          <output htmlFor="width height">
-            {width * height} pixels ≈{" "}
-            {((width * height) / 1_000_000).toFixed(2)} megapixels
-          </output>
-        </label>
-        <label>
-          Pixel density:{" "}
-          <output htmlFor="size width height">
-            {ppi.toFixed(1)} ppi ≈ {ppcm.toFixed(1)} pixels/cm
-          </output>
-        </label>
-        <label>
-          Pixel pitch:{" "}
-          <output htmlFor="size width height">
-            {(mmpp * 1000).toFixed(1)} μm
-          </output>
-        </label>
-        <label>
-          Pixel angle:{" "}
-          <output htmlFor="size width height distance">
-            {minpp.toFixed(2)}′ ≈ {(minpp / 60).toFixed(4)}° ≈{" "}
-            {(radpp / pixelunit).toFixed(2)} px
-          </output>
-        </label>
-        <label>
-          Device pixel ratio:{" "}
-          <output htmlFor="size width height distance">
-            {pixelRatio.toFixed(2)} pixels/px
-          </output>
-        </label>
-        <label>
-          Equivalent eyesight:{" "}
-          <output htmlFor="size width height distance">
-            {(1 / minpp).toFixed(2)}
-          </output>
-        </label>
-        <label>
-          Equivalent illuminance:{" "}
-          <output htmlFor="luminance">{illuminance.toFixed(0)} lx</output>
-        </label>
-        <label>
-          Equivalent luminous power:{" "}
-          <output htmlFor="size width height luminance">
-            {luminousPower.toFixed(0)} lm
-          </output>
-        </label>
-      </div>
-    </div>
+    </main>
   );
 }
