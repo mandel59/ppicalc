@@ -245,7 +245,7 @@ export function PPICalc(props: Props) {
             </output>
           </label>
           <label>
-            Equivalent eyesight:{" "}
+            Equivalent visual acuity:{" "}
             <output htmlFor="size width height distance">
               {(1 / minpp).toFixed(2)}
             </output>
