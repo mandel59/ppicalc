@@ -138,7 +138,9 @@ export function PPICalc(props: Props) {
   const mmpp = 1 / ppmm;
   const distancemm = distance * 10;
   const radpp = mmpp / distancemm;
-  const minpp = radpp * rad2deg * 60;
+  const dpp = radpp * rad2deg;
+  const minpp = dpp * 60;
+  const ppd = 1 / dpp;
   const viewangle = 2 * Math.atan2(widthmm / 2, distancemm) * rad2deg;
   const verticalViewangle = 2 * Math.atan2(heightmm / 2, distancemm) * rad2deg;
   const illuminance = Math.PI * luminance;
@@ -211,6 +213,12 @@ export function PPICalc(props: Props) {
             Pixel pitch:{" "}
             <output htmlFor="size width height">
               {(mmpp * 1000).toFixed(1)} μm
+            </output>
+          </label>
+          <label>
+            Angular pixel density:{" "}
+            <output htmlFor="size width height distance">
+              {ppd.toFixed(2)} ppd
             </output>
           </label>
           <label>
