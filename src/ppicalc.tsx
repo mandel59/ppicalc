@@ -10,9 +10,19 @@ export type Props = {
   luminance?: number;
 };
 
+// 1in = 2.54cm = 96px
+// https://www.w3.org/TR/css-values-3/
 const inch2mm = 25.4;
 const rad2deg = 180 / Math.PI;
 const inch2px = 96;
+// The reference pixel is the visual angle of one pixel
+// on a device with a device pixel density of 96dpi
+// and a distance from the reader of an arm’s length.
+// https://www.w3.org/TR/css-values-3/
+// Therefore the visual angle of one pixel is calculated as:
+// 96px = (1 / 28) rad
+// 1px = (1 / (28 * 96)) rad
+// assuming the arm’s is 28in.
 const armsLength = 28;
 const pixelunit = 1 / (armsLength * inch2px);
 
